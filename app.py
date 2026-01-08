@@ -121,7 +121,7 @@ try:
             )
     
             st.pydeck_chart(pdk.Deck(
-                map_style="https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
+                map_style="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
                 initial_view_state=view_state,
                 layers=[icon_layer],
                 tooltip={"text": "{name}\n{address}"}
