@@ -6,7 +6,7 @@ st.set_page_config(page_title="Mon Guide Perso", layout="wide")
 st.title("🍴 Mon Répertoire de Restaurants & Bars")
 
 # Chargement des données
-df = pd.read_csv("adresses.csv")
+df = pd.read_csv("spottable v1.xlsx")
 
 # Extraction des tags uniques pour le filtre
 all_tags = set()
