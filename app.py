@@ -59,73 +59,82 @@ try:
     c_name = next((c for c in df.columns if c.lower() in ['name', 'nom']), df.columns[0])
     c_addr = next((c for c in df.columns if c.lower() in ['address', 'adresse']), df.columns[1])
 
-    import pydeck as pdk  # Ajoute cet import tout en haut de ton fichier app.py
+    import pydeck as pdk
+import pandas as pd
 
-    # ... (reste du code inchangé)
+# ... (votre code de chargement et filtrage)
 
-    with col1:
-        st.subheader("📍 Carte")
-        df_map = df_filtered.dropna(subset=['lat', 'lon'])
+with col1:
+    st.subheader("📍 Carte")
+    df_map = df_filtered.dropna(subset=['lat', 'lon']).copy()
     
-        if not df_map.empty:
-            # Configuration de l'icône
-            ICON_URL = "https://img.icons8.com/plasticine/100/marker.png"
-            icon_data = {
-                "url": ICON_URL,
-                "width": 128,
-                "height": 128,
-                "anchorY": 128,
-            }
+    if not df_map.empty:
+        # 1. URL de l'icône (Pin type Google)
+        ICON_URL = "https://img.icons8.com/color/96/marker.png"
         
-            # Ajout de la colonne icône au dataframe
-            df_map["icon_data"] = [icon_data for _ in range(len(df_map))]
+        # 2. Configuration de l'icône pour chaque point
+        icon_data = {
+            "url": ICON_URL,
+            "width": 100,
+            "height": 100,
+            "anchorY": 100, # La pointe de l'épingle est sur la coordonnée
+        }
+        df_map["icon_data"] = [icon_data for _ in range(len(df_map))]
 
-            # Création de la couche d'icônes (Pins)
-            icon_layer = pdk.Layer(
-                type="IconLayer",
-                data=df_map,
-                get_icon="icon_data",
-                get_size=4,
-                size_scale=10,
-                get_position=["lon", "lat"],
-                pickable=True,
-            )
-    
-            # Configuration de la vue initiale (centrée sur tes points)
-            view_state = pdk.ViewState(
-                latitude=df_map["lat"].mean(),
-                longitude=df_map["lon"].mean(),
-                zoom=13,
-                pitch=0,
-            )
-    
-            # Affichage de la carte avec échelle et contrôles
-            st.pydeck_chart(pdk.Deck(
-                map_style="mapbox://styles/mapbox/light-v9",
-                initial_view_state=view_state,
-                layers=[icon_layer],
-                tooltip={"text": "{name}\n{address}"} # Bulle d'info au survol
-            ))
-        else:
-            st.warning("Aucune coordonnée disponible.")
+        # 3. Création de la couche d'icônes
+        icon_layer = pdk.Layer(
+            type="IconLayer",
+            data=df_map,
+            get_icon="icon_data",
+            get_size=4,
+            size_scale=10,
+            get_position=["lon", "lat"],
+            pickable=True, # Indispensable pour l'interaction
+        )
 
+        # 4. Vue centrée dynamiquement
+        view_state = pdk.ViewState(
+            latitude=df_map["lat"].mean(),
+            longitude=df_map["lon"].mean(),
+            zoom=13,
+            pitch=0,
+        )
+
+        # 5. Rendu de la carte avec Tooltip (Bulle d'info)
+        st.pydeck_chart(pdk.Deck(
+            map_style="mapbox://styles/mapbox/streets-v11",
+            initial_view_state=view_state,
+            layers=[icon_layer],
+            tooltip={
+                "html": "<b>{name}</b><br/>{address}<br/><i>Cliquer pour l'itinéraire</i>",
+                "style": {"color": "white"}
+            }
+        ))
+    else:
+        st.warning("Aucune coordonnée disponible.")
+
+    
     with col2:
-        st.subheader("⬇️ Liste")
-        if df_filtered.empty:
-            st.info("Aucun résultat pour ces filtres.")
-        else:
-            for _, row in df_filtered.iterrows():
-                # On utilise les noms de colonnes détectés plus haut
-                titre = str(row[c_name]).upper()
-                with st.expander(f"**{titre}**"):
-                    st.write(f"📍 {row[c_addr]}")
-                    if col_tags:
-                        st.caption(f"Tags : {row[col_tags]}")
-                    
-                    # Gestion du lien Google Maps
-                    c_link = next((c for c in df.columns if 'map' in c.lower() or 'lien' in c.lower()), None)
-                    if c_link and pd.notna(row[c_link]):
-                        st.link_button("Voir sur Google Maps", row[c_link])
+    st.subheader("⬇️ Liste")
+    if df_filtered.empty:
+        st.info("Aucun résultat pour ces filtres.")
+    else:
+        for _, row in df_filtered.iterrows():
+            titre = str(row[c_name]).upper()
+            with st.expander(f"**{titre}**"):
+                # Affichage de l'adresse
+                st.write(f"📍 {row[c_addr]}")
+                
+                # Affichage des tags en petit
+                if col_tags:
+                    st.caption(f"Tags : {row[col_tags]}")
+                
+                # Recherche du lien (on ajoute 'geo' à la recherche car ta colonne s'appelle Geolocation)
+                c_link = next((c for c in df.columns if any(word in c.lower() for word in ['map', 'lien', 'geo'])), None)
+                
+                if c_link and pd.notna(row[c_link]):
+                    # Bouton qui prend toute la largeur pour être facile à cliquer sur mobile
+                    st.link_button("🚀 Itinéraire Google Maps", row[c_link], use_container_width=True)
 
 except FileNotFoundError:
     st.error("Erreur : Le fichier 'Spottable v1.csv' est introuvable sur GitHub.")
