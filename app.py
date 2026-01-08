@@ -10,14 +10,14 @@ df = pd.read_csv("Spottable v1.csv")
 
 # Extraction des tags uniques pour le filtre
 all_tags = set()
-df['tags'].str.split(',').apply(lambda x: [all_tags.add(t.strip()) for t in x])
+df['Tags'].str.split(',').apply(lambda x: [all_tags.add(t.strip()) for t in x])
 
 # Interface de filtrage
 selection = st.multiselect("Filtrer par ambiance :", sorted(list(all_tags)))
 
 # Logique de filtre
 if selection:
-    df_final = df[df['tags'].apply(lambda x: any(t.strip() in selection for t in x.split(',')))]
+    df_final = df[df['Tags'].apply(lambda x: any(t.strip() in selection for t in x.split(',')))]
 else:
     df_final = df
 
