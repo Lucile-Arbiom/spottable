@@ -56,7 +56,7 @@ try:
 
     with col1:
         st.subheader("📍 Carte")
-        df_map = df_filtered.dropna(subset=['Latitude', 'Longitude'])
+        df_map = df_filtered.dropna(subset=['lat', 'lon'])
         if not df_map.empty:
             st.map(df_map)
         else:
