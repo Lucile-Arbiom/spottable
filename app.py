@@ -68,7 +68,7 @@ try:
             st.warning("Aucune coordonnée disponible pour la carte. Vérifiez les adresses dans votre fichier.")
 
     with col2:
-        st.subheader("📋 Liste des établissements")
+        st.subheader("⬇️ Liste")
         if df_filtered.empty:
             st.info("Aucun résultat pour ces filtres.")
         else:
