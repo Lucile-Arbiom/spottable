@@ -54,14 +54,35 @@ else:
 
 # --- CHARGEMENT DES DONNÉES ---
 try:
-    # Lecture du CSV avec détection automatique du séparateur (virgule ou point-virgule)
     df = pd.read_csv("Spottable v2.csv", sep=None, engine='python')
-    df.columns = df.columns.str.strip().str.lower() # Nettoyage des noms de colonnes
-
-    # Force le renommage pour Streamlit et conversion en nombres
+    df.columns = df.columns.str.strip().str.lower()
+    
+    # Harmonisation des coordonnées
     df = df.rename(columns={'latitude': 'lat', 'longitude': 'lon'})
     df['lat'] = pd.to_numeric(df['lat'], errors='coerce')
     df['lon'] = pd.to_numeric(df['lon'], errors='coerce')
+
+    # Identification des colonnes clés (pour éviter d'autres NameError)
+    c_name = next((c for c in df.columns if c.lower() in ['name', 'nom']), df.columns[0])
+    c_addr = next((c for c in df.columns if c.lower() in ['address', 'adresse']), df.columns[1])
+    col_tags = next((c for c in df.columns if c.lower() == 'tags'), None)
+
+    # --- 2. RECHERCHE ET FILTRES (Seulement si df existe) ---
+    col_search, _ = st.columns([1, 2])
+    with col_search:
+        search_query = st.text_input("🔍 Rechercher un spot", placeholder="Nom du restaurant...")
+
+    if search_query:
+        df_filtered = df[df[c_name].str.contains(search_query, case=False, na=False)].copy()
+    else:
+        df_filtered = df.copy()
+
+    # --- 3. SWITCHS POUR LES TAGS ---
+    st.write("### Filtrer")
+    if col_tags:
+        # Extraction et affichage des switchs... (ton code précédent)
+        # ...
+        pass # Remplacer par ton code de toggle
 
 
     # --- FILTRES ---
@@ -199,4 +220,4 @@ try:
 except FileNotFoundError:
     st.error("Erreur : Le fichier 'Spottable v1.csv' est introuvable sur GitHub.")
 except Exception as e:
-    st.error(f"Une erreur est survenue : {e}")
+    st.error(f"Erreur lors du chargement des données : {e}")
