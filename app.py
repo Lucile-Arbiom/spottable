@@ -9,6 +9,29 @@ st.set_page_config(page_title="Mes spots", layout="wide")
 
 st.title("Mes spots")
 
+# Configuration des couleurs des boutons
+st.markdown(f"""
+    <style>
+    .stButton>button {{
+        background-color: #d92644;
+        color: white;
+        border-radius: 8px;
+        border: None;
+    }}
+    .tag-label {{
+        display: inline-block;
+        background-color: #f0f2f6;
+        color: #d92644;
+        padding: 2px 8px;
+        border-radius: 12px;
+        margin-right: 5px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        border: 1px solid #d92644;
+    }}
+    </style>
+    """, unsafe_allow_html=True)
+
 
 # --- CHARGEMENT DES DONNÉES ---
 try:
@@ -70,7 +93,7 @@ try:
         
         if not df_map.empty:
             # 1. URL de l'icône (Pin type Google)
-            ICON_URL = "https://img.icons8.com/color/96/marker.png"
+            ICON_URL = "https://img.icons8.com/color/d92644/marker.png"
             
             # 2. Configuration de l'icône pour chaque point
             icon_data = {
@@ -120,21 +143,33 @@ try:
             st.info("Aucun résultat pour ces filtres.")
         else:
             for _, row in df_filtered.iterrows():
-                titre = str(row[c_name]).upper()
-                with st.expander(f"**{titre}**"):
-                    # Affichage de l'adresse
+                # Respect de la casse originale
+                nom_affiche = str(row[c_name])
+                
+                with st.expander(f"**{nom_affiche}**"):
+                    # 1. Adresse
                     st.write(f"📍 {row[c_addr]}")
                     
-                    # Affichage des tags en petit
-                    if col_tags:
-                        st.caption(f"Tags : {row[col_tags]}")
+                    # 2. Description en italique (si elle existe)
+                    c_desc = next((c for c in df.columns if 'desc' in c.lower()), None)
+                    if c_desc and pd.notna(row[c_desc]):
+                        st.write(f"*{row[c_desc]}*")
                     
-                    # Recherche du lien (on ajoute 'geo' à la recherche car ta colonne s'appelle Geolocation)
+                    # 3. Tags sous forme d'étiquettes colorées
+                    if col_tags and pd.notna(row[col_tags]):
+                        tags_list = [t.strip() for t in str(row[col_tags]).split(',')]
+                        tag_html = ""
+                        for t in tags_list:
+                            tag_html += f'<span class="tag-label">{t}</span>'
+                        st.markdown(tag_html, unsafe_allow_html=True)
+                    
+                    st.write("") # Petit espace
+    
+                    # 4. Bouton "Y aller" stylisé
                     c_link = next((c for c in df.columns if any(word in c.lower() for word in ['map', 'lien', 'geo'])), None)
-                    
                     if c_link and pd.notna(row[c_link]):
-                        # Bouton qui prend toute la largeur pour être facile à cliquer sur mobile
-                        st.link_button("🚀 Itinéraire Google Maps", row[c_link], use_container_width=True)
+                        # On utilise un st.link_button avec le style injecté plus haut
+                        st.link_button("**Y aller**", row[c_link], use_container_width=True)
 
 except FileNotFoundError:
     st.error("Erreur : Le fichier 'Spottable v1.csv' est introuvable sur GitHub.")
