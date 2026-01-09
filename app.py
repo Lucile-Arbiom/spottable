@@ -14,57 +14,31 @@ st.markdown(f"""
         background-color: #fde8ea;
     }}
 
-    /* 2. Couleur du Titre Principal (H1) */
+    /* Titre en Rouge */
     h1 {{
         color: #d92644 !important;
     }}
 
-    /* 3. Couleur de TOUT le texte (Gris foncé) */
-    html, body, [class*="st-"] {{
+    /* Texte en Gris foncé */
+    html, body, [class*="st-"], p, div {{
         color: #31333f !important;
     }}
 
-    /* 4. Forcer la couleur noire/grise pour les noms dans la liste (Expanders) */
-    .streamlit-expanderHeader p {{
-        color: #31333f !important;
-        font-weight: bold;
-    }}
-
-    /* 5. Style des cartes (Expanders) pour qu'elles restent blanches */
-    .st-expander {{
-        background-color: white !important;
-        border: 1px solid #fde8ea !important;
-        border-radius: 8px !important;
-    }}
-
-    /* 1. Style de la barre de recherche (Gris clair) */
-    div[data-baseweb="input"] {
-        background-color: #f0f2f6 !important; /* Gris clair */
-        border-radius: 8px !important;
-    }
-    
-    /* 2. Style des Switchs (Toggles) */
-    /* Fond quand le switch est DÉSACTIVÉ (Gris clair) */
-    div[data-baseweb="toggle"] > div:nth-child(1) {
+    /* Barre de recherche en Gris clair */
+    div[data-baseweb="input"] {{
         background-color: #f0f2f6 !important;
-    }
-    
-    /* Fond quand le switch est ACTIVÉ (Ton rouge principal) */
-    div[data-baseweb="toggle"][aria-checked="true"] > div:nth-child(2) {
+        border-radius: 8px !important;
+    }}
+
+    /* Switchs (Toggles) : Gris quand éteint, Rouge quand allumé */
+    div[data-baseweb="toggle"] > div:nth-child(1) {{
+        background-color: #f0f2f6 !important;
+    }}
+    div[data-baseweb="toggle"][aria-checked="true"] > div:nth-child(2) {{
         background-color: #d92644 !important;
-    }
+    }}
 
-    /* Le petit bouton rond du switch */
-    div[data-baseweb="toggle"] div:nth-child(3) {
-        background-color: white !important;
-    }
-
-    /* 3. Couleur du texte de la recherche (Gris foncé) */
-    input {
-        color: #31333f !important;
-    }
-
-    /* 6. Style des étiquettes (Tags) */
+    /* Étiquettes (Tags) */
     .tag-label {{
         display: inline-block;
         background-color: #ffffff;
@@ -78,14 +52,20 @@ st.markdown(f"""
         border: 1px solid #d92644;
     }}
 
-    /* 7. Style du bouton "Y aller" */
+    /* Bouton "Y aller" */
     .stButton>button {{
         background-color: #d92644 !important;
         color: white !important;
         border-radius: 8px !important;
         border: none !important;
     }}
-    
+
+    /* Cartes (Expanders) blanches */
+    .st-expander {{
+        background-color: white !important;
+        border: 1px solid #fde8ea !important;
+        border-radius: 8px !important;
+    }}
     </style>
     """, unsafe_allow_html=True)
 
