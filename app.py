@@ -8,77 +8,81 @@ st.set_page_config(page_title="Mes spots", layout="wide")
 # 2. Style CSS complet
 st.markdown(f"""
     <style>
-    /* Fond de l'application */
+    /* 1. Fond de l'application */
     .stApp {{
-        background-color:#bad8d6;
+        background-color: #bad8d6;
     }}
 
-    /* Titre en Rouge */
+    /* 2. Titre et textes globaux */
     h1 {{
         color: #d92644 !important;
     }}
-
-    /* Texte global en Gris foncé */
     html, body, [class*="st-"], p, div, span, label {{
         color: #31333f !important;
     }}
 
-    /* 1. BARRE DE RECHERCHE : Gris clair, SANS CONTOUR, Texte gris foncé */
+    /* 3. Barre de recherche et Toggles */
     div[data-testid="stTextInput"] div[data-baseweb="input"] {{
         background-color: #f0f2f6 !important;
-        border: none !important; /* Supprime le contour */
-        box-shadow: none !important; /* Supprime l'ombre/halo au clic */
+        border: none !important;
+        box-shadow: none !important;
     }}
-    
     div[data-testid="stTextInput"] input {{
         color: #31333f !important;
         -webkit-text-fill-color: #31333f !important;
-        background-color: #f0f2f6 !important;
-        border: none !important;
     }}
-
-    /* Texte du placeholder (Rechercher un spot) en gris foncé */
     div[data-testid="stTextInput"] input::placeholder {{
         color: #31333f !important;
         opacity: 0.7 !important;
     }}
-
-    /* 2. TOGGLES (Switchs) : Gris clair quand éteint */
     div[data-testid="stWidgetLabel"] + div div[role="switch"] {{
         background-color: #f0f2f6 !important;
-        background-image: none !important;
     }}
-
-    /* Switch quand il est ACTIVÉ (Rouge) */
     div[data-testid="stWidgetLabel"] + div div[aria-checked="true"] {{
         background-color: #d92644 !important;
     }}
 
-    /* 3. LISTE ET BOUTONS */
+    /* 4. LISTE DES ADRESSES (Expanders) */
+    /* Empêche le fond de devenir noir/gris foncé à l'ouverture */
+    .st-expander, .streamlit-expanderHeader {{
+        background-color: white !important;
+        border: 1px solid #e0e0e0 !important;
+        border-radius: 8px !important;
+    }}
+    
+    /* Couleur au survol et quand ouvert (gris très léger) */
+    .streamlit-expanderHeader:hover, .streamlit-expanderHeader[aria-expanded="true"] {{
+        background-color: #f8f9fa !important;
+        color: #31333f !important;
+    }}
+
+    /* 5. ÉTIQUETTES DE TAGS (Gris clair texte foncé) */
     .tag-label {{
         display: inline-block;
-        background-color: #ffffff;
-        color: #d92644;
+        background-color: #f0f2f6;
+        color: #31333f;
         padding: 2px 10px;
         border-radius: 15px;
         margin-right: 5px;
         margin-bottom: 5px;
         font-size: 0.75rem;
         font-weight: bold;
-        border: 1px solid #d92644;
-    }}
-
-    .stButton>button {{
-        background-color: #d92644 !important;
-        color: white !important;
-        border-radius: 8px !important;
         border: none !important;
     }}
 
-    .st-expander {{
-        background-color: white !important;
-        border: 1px solid #fde8ea !important;
+    /* 6. BOUTON "Y ALLER" (Rouge clair sans contour) */
+    .stButton>button {{
+        background-color: #fde8ea !important;
+        color: #31333f !important;
+        font-weight: bold !important;
         border-radius: 8px !important;
+        border: none !important;
+        box-shadow: none !important;
+    }}
+    
+    .stButton>button:hover {{
+        background-color: #fbcfd3 !important; /* Un rouge un poil plus foncé au survol */
+        color: #31333f !important;
     }}
     </style>
     """, unsafe_allow_html=True)
