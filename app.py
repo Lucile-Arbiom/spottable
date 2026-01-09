@@ -1,27 +1,35 @@
 import streamlit as st
 import pandas as pd
 import pydeck as pdk
+from streamlit_js_eval import get_geolocation
 
 # 1. Configuration de la page
 st.set_page_config(page_title="Mes spots", layout="wide")
 
-# 2. Style CSS complet
+# 2. Style CSS complet (Optimisé pour forcer les couleurs)
 st.markdown(f"""
     <style>
-    /* 1. Fond de l'application */
+    /* Fond de l'application */
     .stApp {{
         background-color: #bad8d6;
     }}
+    
+    /* Supprime la barre blanche en haut */
+    header[data-testid="stHeader"] {{
+        background-color: rgba(0,0,0,0) !important;
+    }}
 
-    /* 2. Titre et textes globaux */
+    /* Titre en Rouge */
     h1 {{
         color: #d92644 !important;
     }}
+
+    /* Texte global en Gris foncé */
     html, body, [class*="st-"], p, div, span, label {{
         color: #31333f !important;
     }}
 
-    /* 3. BARRE DE RECHERCHE : Gris clair et texte foncé */
+    /* Barre de recherche : Gris clair et texte foncé */
     div[data-testid="stTextInput"] div[data-baseweb="input"] {{
         background-color: #f0f2f6 !important;
         border: none !important;
@@ -32,7 +40,7 @@ st.markdown(f"""
         -webkit-text-fill-color: #31333f !important;
     }}
 
-    /* 4. EXPANDERS : Forcer le blanc */
+    /* Expanders blancs */
     div[data-testid="stExpander"] {{
         background-color: white !important;
         border: none !important;
@@ -40,10 +48,9 @@ st.markdown(f"""
     }}
     div[data-testid="stExpander"] summary {{
         background-color: white !important;
-        color: #31333f !important;
     }}
 
-    /* 5. BOUTON "Y ALLER" : Correction spécifique pour st.link_button */
+    /* BOUTON "Y ALLER" : Rouge clair et texte foncé */
     .stLinkButton a {{
         background-color: #fde8ea !important;
         color: #31333f !important;
@@ -55,19 +62,14 @@ st.markdown(f"""
         justify-content: center !important;
         padding: 10px !important;
     }}
-
-    /* On force la couleur du texte à l'intérieur du bouton */
+    .stLinkButton a:hover {{
+        background-color: #fbcfd3 !important;
+    }}
     .stLinkButton a span, .stLinkButton a p {{
         color: #31333f !important;
     }}
 
-    /* Effet au survol */
-    .stLinkButton a:hover {{
-        background-color: #fbcfd3 !important;
-        border: none !important;
-    }}
-
-    /* 6. ÉTIQUETTES DE TAGS */
+    /* Étiquettes de tags */
     .tag-label {{
         display: inline-block;
         background-color: #f0f2f6;
@@ -79,8 +81,8 @@ st.markdown(f"""
         font-size: 0.75rem;
         font-weight: bold;
     }}
-    
-    /* 7. TOGGLES (Switchs) */
+
+    /* Toggles */
     div[data-testid="stWidgetLabel"] + div div[role="switch"] {{
         background-color: #f0f2f6 !important;
     }}
@@ -92,144 +94,96 @@ st.markdown(f"""
 
 st.title("Mes spots")
 
-# 3. Chargement des données
+# 3. Logique et Données
 try:
     df = pd.read_csv("Spottable v2.csv", sep=None, engine='python')
     df.columns = df.columns.str.strip().str.lower()
-
-    from streamlit_js_eval import get_geolocation
-
-    # Récupération de la position de l'utilisateur
-    user_pos = get_geolocation()
     
-    # Préparation du point de l'utilisateur
+    # --- Géolocalisation ---
+    user_pos = get_geolocation()
     user_layer = None
     if user_pos:
-        user_lat = user_pos['coords']['latitude']
-        user_lon = user_pos['coords']['longitude']
-        
-        # Création d'un petit DataFrame pour le point "Moi"
-        df_user = pd.DataFrame({'lat': [user_lat], 'lon': [user_lon]})
-        
-        # Icône différente pour l'utilisateur (un point bleu par exemple)
+        df_user = pd.DataFrame({
+            'lat': [user_pos['coords']['latitude']], 
+            'lon': [user_pos['coords']['longitude']]
+        })
         user_layer = pdk.Layer(
             "ScatterplotLayer",
             data=df_user,
             get_position=["lon", "lat"],
-            get_color=[0, 150, 255, 200], # Bleu
-            get_radius=100,
+            get_color=[0, 150, 255, 200], # Point bleu
+            get_radius=150,
             pickable=True,
         )
-    
 
-    # Harmonisation des coordonnées
+    # Harmonisation data
     df = df.rename(columns={'latitude': 'lat', 'longitude': 'lon'})
     df['lat'] = pd.to_numeric(df['lat'], errors='coerce')
     df['lon'] = pd.to_numeric(df['lon'], errors='coerce')
 
-    # Identification des colonnes clés
     c_name = next((c for c in df.columns if c.lower() in ['name', 'nom']), df.columns[0])
     c_addr = next((c for c in df.columns if c.lower() in ['address', 'adresse']), df.columns[1])
     col_tags = next((c for c in df.columns if c.lower() == 'tags'), None)
 
-    # --- RECHERCHE ---
-    col_search, _ = st.columns([1, 2]) 
+    # Barre de recherche
+    col_search, _ = st.columns([1, 2])
     with col_search:
-        # label_visibility="collapsed" enlève le texte au-dessus
-        search_query = st.text_input(
-            "Rechercher", 
-            placeholder="Rechercher un spot", 
-            label_visibility="collapsed"
-        )
+        search_query = st.text_input("Rechercher", placeholder="Rechercher un spot", label_visibility="collapsed")
 
-    if search_query:
-        df_filtered = df[df[c_name].str.contains(search_query, case=False, na=False)].copy()
-    else:
-        df_filtered = df.copy()
+    df_filtered = df[df[c_name].str.contains(search_query, case=False, na=False)].copy() if search_query else df.copy()
 
-    # --- FILTRES (SWITCHS) ---
+    # Filtres
     st.write("### Filtrer")
     if col_tags:
         all_tags = sorted(list(set([t.strip() for val in df[col_tags].dropna() for t in str(val).split(',')])))
-        cols = st.columns(len(all_tags) if len(all_tags) < 6 else 6)
+        t_cols = st.columns(len(all_tags) if len(all_tags) < 6 else 6)
         selected_tags = []
-        
         for i, tag in enumerate(all_tags):
-            with cols[i % len(cols)]:
-                # Key unique obligatoire pour les toggles
+            with t_cols[i % len(t_cols)]:
                 if st.toggle(tag, key=f"toggle_{tag}"):
                     selected_tags.append(tag)
         
         if selected_tags:
-            def match_tags(cell_value):
-                if pd.isna(cell_value): return False
-                cell_tags = [t.strip() for t in str(cell_value).split(',')]
-                return any(tag in cell_tags for tag in selected_tags)
+            def match_tags(val):
+                if pd.isna(val): return False
+                return any(t.strip() in selected_tags for t in str(val).split(','))
             df_filtered = df_filtered[df_filtered[col_tags].apply(match_tags)]
 
-    # --- AFFICHAGE ---
+    # 4. Affichage
     col1, col2 = st.columns([2, 1])
 
     with col1:
         df_map = df_filtered.dropna(subset=['lat', 'lon']).copy()
-        
         if not df_map.empty:
-            ICON_URL = "https://img.icons8.com/ios-filled/100/d92644/marker.png"
-            icon_data = {"url": ICON_URL, "width": 100, "height": 100, "anchorY": 100}
+            icon_data = {"url": "https://img.icons8.com/ios-filled/100/d92644/marker.png", "width": 100, "height": 100, "anchorY": 100}
             df_map["icon_data"] = [icon_data for _ in range(len(df_map))]
-
-            icon_layer = pdk.Layer(
-                "IconLayer",
-                data=df_map,
-                get_icon="icon_data",
-                get_size=4,
-                size_scale=10,
-                get_position=["lon", "lat"],
-                pickable=True,
-            )
-
-            view_state = pdk.ViewState(
-                latitude=df_map["lat"].mean(),
-                longitude=df_map["lon"].mean(),
-                zoom=12,
-                pitch=0,
-            )
-
-            layers_to_show = [icon_layer]
-            if user_layer:
-                layers_to_show.append(user_layer)
             
+            layers = [pdk.Layer("IconLayer", data=df_map, get_icon="icon_data", get_size=4, size_scale=10, get_position=["lon", "lat"], pickable=True)]
+            if user_layer: layers.append(user_layer)
+
+            view_state = pdk.ViewState(latitude=df_map["lat"].mean(), longitude=df_map["lon"].mean(), zoom=12)
             st.pydeck_chart(pdk.Deck(
-                map_style="...",
+                map_style="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
                 initial_view_state=view_state,
-                layers=layers_to_show, # Utilise la liste combinée ici
-                tooltip=...
+                layers=layers,
+                tooltip={"text": "{"+c_name+"}\n{"+c_addr+"}"}
             ))
         else:
-            st.warning("Aucun spot à afficher sur la carte.")
+            st.warning("Aucun spot trouvé.")
 
     with col2:
-        if df_filtered.empty:
-            st.info("Aucun résultat pour ces filtres.")
-        else:
-            for _, row in df_filtered.iterrows():
-                nom_affiche = str(row[c_name])
-                with st.expander(f"**{nom_affiche}**"):
-                    st.write(f"📍 {row[c_addr]}")
-                    
-                    c_desc = next((c for c in df.columns if 'desc' in c.lower()), None)
-                    if c_desc and pd.notna(row[c_desc]):
-                        st.write(f"*{row[c_desc]}*")
-                    
-                    if col_tags and pd.notna(row[col_tags]):
-                        tags_list = [t.strip() for t in str(row[col_tags]).split(',')]
-                        tag_html = "".join([f'<span class="tag-label">{t}</span>' for t in tags_list])
-                        st.markdown(tag_html, unsafe_allow_html=True)
-                    
-                    st.write("")
-                    c_link = next((c for c in df.columns if any(word in c.lower() for word in ['map', 'lien', 'geo'])), None)
-                    if c_link and pd.notna(row[c_link]):
-                        st.link_button("**Y aller**", row[c_link], use_container_width=True)
+        for _, row in df_filtered.iterrows():
+            with st.expander(f"**{row[c_name]}**"):
+                st.write(f"📍 {row[c_addr]}")
+                c_desc = next((c for c in df.columns if 'desc' in c.lower()), None)
+                if c_desc and pd.notna(row[c_desc]): st.write(f"*{row[c_desc]}*")
+                if col_tags and pd.notna(row[col_tags]):
+                    tags = "".join([f'<span class="tag-label">{t.strip()}</span>' for t in str(row[col_tags]).split(',')])
+                    st.markdown(tags, unsafe_allow_html=True)
+                st.write("")
+                c_link = next((c for c in df.columns if any(w in c.lower() for w in ['map', 'lien', 'geo'])), None)
+                if c_link and pd.notna(row[c_link]):
+                    st.link_button("**Y aller**", row[c_link], use_container_width=True)
 
 except Exception as e:
-    st.error(f"Une erreur est survenue : {e}")
+    st.error(f"Erreur : {e}")
