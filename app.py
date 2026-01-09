@@ -4,12 +4,11 @@ import pydeck as pdk
 
 # 1. Configuration de la page
 st.set_page_config(page_title="Mes spots", layout="wide")
-st.title("Mes spots")
 
-# 2. Style CSS
+# 2. Style CSS complet
 st.markdown(f"""
     <style>
-    /* 1. Fond de l'application (Rouge très clair) */
+    /* Fond de l'application (Rouge très clair) */
     .stApp {{
         background-color: #fde8ea;
     }}
@@ -19,8 +18,8 @@ st.markdown(f"""
         color: #d92644 !important;
     }}
 
-    /* Texte en Gris foncé */
-    html, body, [class*="st-"], p, div {{
+    /* Texte global en Gris foncé */
+    html, body, [class*="st-"], p, div, span, label {{
         color: #31333f !important;
     }}
 
@@ -69,7 +68,9 @@ st.markdown(f"""
     </style>
     """, unsafe_allow_html=True)
 
-# 3. Chargement des données (DOIT ÊTRE AVANT LES FILTRES)
+st.title("Mes spots")
+
+# 3. Chargement des données
 try:
     df = pd.read_csv("Spottable v2.csv", sep=None, engine='python')
     df.columns = df.columns.str.strip().str.lower()
@@ -87,7 +88,8 @@ try:
     # --- RECHERCHE ---
     col_search, _ = st.columns([1, 2]) 
     with col_search:
-        search_query = st.text_input(placeholder="Rechercher un spot")
+        # CORRECTION ICI : Ajout du label "Rechercher"
+        search_query = st.text_input("Rechercher", placeholder="Rechercher un spot")
 
     if search_query:
         df_filtered = df[df[c_name].str.contains(search_query, case=False, na=False)].copy()
@@ -103,6 +105,7 @@ try:
         
         for i, tag in enumerate(all_tags):
             with cols[i % len(cols)]:
+                # Key unique obligatoire pour les toggles
                 if st.toggle(tag, key=f"toggle_{tag}"):
                     selected_tags.append(tag)
         
@@ -117,6 +120,7 @@ try:
     col1, col2 = st.columns([2, 1])
 
     with col1:
+        st.subheader("📍 Carte")
         df_map = df_filtered.dropna(subset=['lat', 'lon']).copy()
         
         if not df_map.empty:
@@ -151,6 +155,7 @@ try:
             st.warning("Aucun spot à afficher sur la carte.")
 
     with col2:
+        st.subheader("⬇️ Liste")
         if df_filtered.empty:
             st.info("Aucun résultat pour ces filtres.")
         else:
@@ -174,4 +179,4 @@ try:
                         st.link_button("**Y aller**", row[c_link], use_container_width=True)
 
 except Exception as e:
-    st.error(f"Erreur lors du chargement ou de l'exécution : {e}")
+    st.error(f"Une erreur est survenue : {e}")
