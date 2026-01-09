@@ -23,28 +23,30 @@ st.markdown(f"""
         color: #31333f !important;
     }}
 
-    /* 1. BARRE DE RECHERCHE : Fond gris clair et texte placeholder gris foncé */
+    /* 1. BARRE DE RECHERCHE : Gris clair, SANS CONTOUR, Texte gris foncé */
     div[data-testid="stTextInput"] div[data-baseweb="input"] {{
         background-color: #f0f2f6 !important;
-        border: 1px solid #dcdfe6 !important;
+        border: none !important; /* Supprime le contour */
+        box-shadow: none !important; /* Supprime l'ombre/halo au clic */
     }}
     
     div[data-testid="stTextInput"] input {{
         color: #31333f !important;
-        -webkit-text-fill-color: #31333f !important; /* Force pour certains navigateurs */
+        -webkit-text-fill-color: #31333f !important;
+        background-color: #f0f2f6 !important;
+        border: none !important;
     }}
 
-    /* Couleur du texte "Rechercher un spot" (le placeholder) */
+    /* Texte du placeholder (Rechercher un spot) en gris foncé */
     div[data-testid="stTextInput"] input::placeholder {{
-        color: #6d6d6d !important;
-        opacity: 1 !important;
+        color: #31333f !important;
+        opacity: 0.7 !important;
     }}
 
-    /* 2. TOGGLES (Switchs) : Forcer le gris clair quand éteint */
-    /* On cible le rail du switch */
+    /* 2. TOGGLES (Switchs) : Gris clair quand éteint */
     div[data-testid="stWidgetLabel"] + div div[role="switch"] {{
         background-color: #f0f2f6 !important;
-        background-image: none !important; /* Enlever d'éventuels dégradés */
+        background-image: none !important;
     }}
 
     /* Switch quand il est ACTIVÉ (Rouge) */
@@ -52,7 +54,7 @@ st.markdown(f"""
         background-color: #d92644 !important;
     }}
 
-    /* 3. COMPOSANTS DE LISTE ET BOUTONS */
+    /* 3. LISTE ET BOUTONS */
     .tag-label {{
         display: inline-block;
         background-color: #ffffff;
