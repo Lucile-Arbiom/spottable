@@ -21,42 +21,54 @@ st.markdown(f"""
         color: #31333f !important;
     }}
 
-    /* 3. Barre de recherche et Toggles */
+    /* 3. BARRE DE RECHERCHE : Forcer le gris clair et texte foncé */
     div[data-testid="stTextInput"] div[data-baseweb="input"] {{
         background-color: #f0f2f6 !important;
         border: none !important;
-        box-shadow: none !important;
     }}
     div[data-testid="stTextInput"] input {{
+        background-color: #f0f2f6 !important;
         color: #31333f !important;
         -webkit-text-fill-color: #31333f !important;
     }}
     div[data-testid="stTextInput"] input::placeholder {{
         color: #31333f !important;
-        opacity: 0.7 !important;
-    }}
-    div[data-testid="stWidgetLabel"] + div div[role="switch"] {{
-        background-color: #f0f2f6 !important;
-    }}
-    div[data-testid="stWidgetLabel"] + div div[aria-checked="true"] {{
-        background-color: #d92644 !important;
+        opacity: 0.5 !important;
     }}
 
-    /* 4. LISTE DES ADRESSES (Expanders) */
-    /* Empêche le fond de devenir noir/gris foncé à l'ouverture */
-    .st-expander, .streamlit-expanderHeader {{
+    /* 4. EXPANDERS (Menus déroulants) : Forcer le blanc/gris clair */
+    /* On cible l'en-tête et le contenu */
+    div[data-testid="stExpander"] {{
         background-color: white !important;
-        border: 1px solid #e0e0e0 !important;
+        border: 1px solid #f0f2f6 !important;
         border-radius: 8px !important;
     }}
     
-    /* Couleur au survol et quand ouvert (gris très léger) */
-    .streamlit-expanderHeader:hover, .streamlit-expanderHeader[aria-expanded="true"] {{
+    div[data-testid="stExpander"] summary {{
+        background-color: white !important;
+        color: #31333f !important;
+    }}
+    
+    div[data-testid="stExpander"] summary:hover {{
         background-color: #f8f9fa !important;
+    }}
+
+    /* 5. BOUTON "Y ALLER" : Rouge clair, texte foncé, sans contour */
+    div.stButton > button {{
+        background-color: #fde8ea !important;
+        color: #31333f !important;
+        border: none !important;
+        font-weight: bold !important;
+        width: 100% !important;
+        box-shadow: none !important;
+    }}
+    
+    div.stButton > button:hover {{
+        background-color: #fbcfd3 !important;
         color: #31333f !important;
     }}
 
-    /* 5. ÉTIQUETTES DE TAGS (Gris clair texte foncé) */
+    /* 6. ÉTIQUETTES DE TAGS */
     .tag-label {{
         display: inline-block;
         background-color: #f0f2f6;
@@ -67,22 +79,14 @@ st.markdown(f"""
         margin-bottom: 5px;
         font-size: 0.75rem;
         font-weight: bold;
-        border: none !important;
-    }}
-
-    /* 6. BOUTON "Y ALLER" (Rouge clair sans contour) */
-    .stButton>button {{
-        background-color: #fde8ea !important;
-        color: #31333f !important;
-        font-weight: bold !important;
-        border-radius: 8px !important;
-        border: none !important;
-        box-shadow: none !important;
     }}
     
-    .stButton>button:hover {{
-        background-color: #fbcfd3 !important; /* Un rouge un poil plus foncé au survol */
-        color: #31333f !important;
+    /* 7. TOGGLES (Switchs) */
+    div[data-testid="stWidgetLabel"] + div div[role="switch"] {{
+        background-color: #f0f2f6 !important;
+    }}
+    div[data-testid="stWidgetLabel"] + div div[aria-checked="true"] {{
+        background-color: #d92644 !important;
     }}
     </style>
     """, unsafe_allow_html=True)
