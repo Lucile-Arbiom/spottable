@@ -8,7 +8,7 @@ st.set_page_config(page_title="Mes spots", layout="wide")
 # 2. Style CSS complet
 st.markdown(f"""
     <style>
-    /* Fond de l'application (Rouge très clair) */
+    /* Fond de l'application */
     .stApp {{
         background-color: #fde8ea;
     }}
@@ -23,19 +23,28 @@ st.markdown(f"""
         color: #31333f !important;
     }}
 
-    /* Barre de recherche en Gris clair */
+    /* 1. BARRE DE RECHERCHE : Fond gris clair et texte placeholder gris foncé */
     div[data-testid="stTextInput"] div[data-baseweb="input"] {{
         background-color: #f0f2f6 !important;
         border: 1px solid #dcdfe6 !important;
     }}
+    
     div[data-testid="stTextInput"] input {{
-        background-color: #f0f2f6 !important;
         color: #31333f !important;
+        -webkit-text-fill-color: #31333f !important; /* Force pour certains navigateurs */
     }}
 
-    /* Switchs (Toggles) : Gris clair quand éteint */
+    /* Couleur du texte "Rechercher un spot" (le placeholder) */
+    div[data-testid="stTextInput"] input::placeholder {{
+        color: #6d6d6d !important;
+        opacity: 1 !important;
+    }}
+
+    /* 2. TOGGLES (Switchs) : Forcer le gris clair quand éteint */
+    /* On cible le rail du switch */
     div[data-testid="stWidgetLabel"] + div div[role="switch"] {{
         background-color: #f0f2f6 !important;
+        background-image: none !important; /* Enlever d'éventuels dégradés */
     }}
 
     /* Switch quand il est ACTIVÉ (Rouge) */
@@ -43,7 +52,7 @@ st.markdown(f"""
         background-color: #d92644 !important;
     }}
 
-    /* Étiquettes (Tags) */
+    /* 3. COMPOSANTS DE LISTE ET BOUTONS */
     .tag-label {{
         display: inline-block;
         background-color: #ffffff;
@@ -57,7 +66,6 @@ st.markdown(f"""
         border: 1px solid #d92644;
     }}
 
-    /* Bouton "Y aller" */
     .stButton>button {{
         background-color: #d92644 !important;
         color: white !important;
@@ -65,7 +73,6 @@ st.markdown(f"""
         border: none !important;
     }}
 
-    /* Cartes (Expanders) blanches */
     .st-expander {{
         background-color: white !important;
         border: 1px solid #fde8ea !important;
@@ -130,7 +137,6 @@ try:
     col1, col2 = st.columns([2, 1])
 
     with col1:
-        st.subheader("📍 Carte")
         df_map = df_filtered.dropna(subset=['lat', 'lon']).copy()
         
         if not df_map.empty:
@@ -165,7 +171,6 @@ try:
             st.warning("Aucun spot à afficher sur la carte.")
 
     with col2:
-        st.subheader("⬇️ Liste")
         if df_filtered.empty:
             st.info("Aucun résultat pour ces filtres.")
         else:
