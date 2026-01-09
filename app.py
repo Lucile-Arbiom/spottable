@@ -9,36 +9,35 @@ st.title("Mes spots")
 # 2. Style CSS
 st.markdown(f"""
     <style>
-    /* 1. Couleur de l'arrière-plan de l'application entière */
+    /* 1. Fond de l'application (Rouge très clair) */
     .stApp {{
-        background-color: #fff5f6;
-    }}
-
-    /* 2. Couleur de l'arrière-plan de la barre latérale (si tu en utilises une) */
-    [data-testid="stSidebar"] {{
         background-color: #fde8ea;
     }}
 
-    /* 3. Style des cartes (Expanders) pour qu'ils ressortent sur le fond clair */
-    .streamlit-expanderHeader {{
-        background-color: white !important;
-        border-radius: 8px !important;
-    }}
-    .st-expander {{
-        border: 1px solid #fde8ea !important;
-        background-color: white !important;
+    /* 2. Couleur du Titre Principal (H1) */
+    h1 {{
+        color: #d92644 !important;
     }}
 
-    /* --- TES STYLES PRÉCÉDENTS (Boutons, Tags, Toggles) --- */
-    .stButton>button {{
-        background-color: #d92644 !important;
-        color: white !important;
+    /* 3. Couleur de TOUT le texte (Gris foncé) */
+    html, body, [class*="st-"] {{
+        color: #31333f !important;
+    }}
+
+    /* 4. Forcer la couleur noire/grise pour les noms dans la liste (Expanders) */
+    .streamlit-expanderHeader p {{
+        color: #31333f !important;
+        font-weight: bold;
+    }}
+
+    /* 5. Style des cartes (Expanders) pour qu'elles restent blanches */
+    .st-expander {{
+        background-color: white !important;
+        border: 1px solid #fde8ea !important;
         border-radius: 8px !important;
-        border: none !important;
     }}
-    div[data-baseweb="toggle"] > div:nth-child(2) {{
-        background-color: #d92644 !important;
-    }}
+
+    /* 6. Style des étiquettes (Tags) */
     .tag-label {{
         display: inline-block;
         background-color: #ffffff;
@@ -50,6 +49,19 @@ st.markdown(f"""
         font-size: 0.75rem;
         font-weight: bold;
         border: 1px solid #d92644;
+    }}
+
+    /* 7. Style du bouton "Y aller" */
+    .stButton>button {{
+        background-color: #d92644 !important;
+        color: white !important;
+        border-radius: 8px !important;
+        border: none !important;
+    }}
+    
+    /* 8. Couleur des switchs (Toggles) */
+    div[data-baseweb="toggle"] > div:nth-child(2) {{
+        background-color: #d92644 !important;
     }}
     </style>
     """, unsafe_allow_html=True)
