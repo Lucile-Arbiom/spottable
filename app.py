@@ -11,7 +11,7 @@ st.markdown(f"""
     <style>
     /* Fond de l'application */
     .stApp {{
-        background-color: #f8e6d2 !important;
+        background-color: #efe6d8 !important;
     }}
     
     /* SUPPRESSION RADICALE DU HEADER ET DE L'ESPACE BLANC */
@@ -34,7 +34,7 @@ st.markdown(f"""
 
     /* Titre */
     h1 {{
-        color: #91222c !important;
+        color: #d92644 !important;
         margin-top: -30px !important;
     }}
 
