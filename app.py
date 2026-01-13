@@ -9,7 +9,7 @@ st.set_page_config(page_title="Mes spots", layout="wide")
 st.markdown(f"""
     <style>
     /* Fond de l'application */
-    .stApp {{ background-color: #efe6d8 !important; }}
+    .stApp {{ background-color: #efede1 !important; }}
     header[data-testid="stHeader"] {{ display: none !important; }}
     div[data-testid="stDecoration"] {{ display: none !important; }}
     .main .block-container {{ padding-top: 2rem !important; }}
@@ -22,7 +22,7 @@ st.markdown(f"""
     /* 1. Base non sélectionnée (Fond #efede1 + Contour #b6beb1) */
     div[data-testid="stExpander"] {{
         background-color: #efede1 !important;
-        border: 1px solid #b6beb1 !important;
+        border: 0.5px solid #b6beb1 !important;
         border-radius: 8px !important;
         margin-bottom: 10px !important;
     }}
