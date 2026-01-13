@@ -22,7 +22,7 @@ st.markdown(f"""
     /* 1. Base non sélectionnée (Fond #efede1 + Contour #b6beb1) */
     div[data-testid="stExpander"] {{
         background-color: #efede1 !important;
-        border: 0.5px solid #b6beb1 !important;
+        border: 0.25px solid #b6beb1 !important;
         border-radius: 8px !important;
         margin-bottom: 10px !important;
     }}
