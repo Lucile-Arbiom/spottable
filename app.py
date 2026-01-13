@@ -11,7 +11,7 @@ st.markdown(f"""
     <style>
     /* Fond de l'application */
     .stApp {{
-        background-color: #bad8d6 !important;
+        background-color: #f8e6d2 !important;
     }}
     
     /* SUPPRESSION RADICALE DU HEADER ET DE L'ESPACE BLANC */
@@ -34,32 +34,32 @@ st.markdown(f"""
 
     /* Titre */
     h1 {{
-        color: #d92644 !important;
+        color: #91222c !important;
         margin-top: -30px !important;
     }}
 
     /* Barre de recherche */
     div[data-testid="stTextInput"] div[data-baseweb="input"] {{
-        background-color: #f0f2f6 !important;
+        background-color: #b6beb1 !important;
         border: none !important;
     }}
     
     div[data-testid="stTextInput"] input {{
-        color: #31333f !important;
-        -webkit-text-fill-color: #31333f !important;
+        color: #673c34 !important;
+        -webkit-text-fill-color: #673c34 !important;
     }}
 
     /* Expanders */
     div[data-testid="stExpander"] {{
-        background-color: white !important;
+        background-color: #f8e6d2 !important;
         border: none !important;
         border-radius: 8px !important;
     }}
 
     /* Bouton Y aller */
     .stLinkButton a {{
-        background-color: #fde8ea !important;
-        color: #31333f !important;
+        background-color: #7397a3 !important;
+        color: #673c34 !important;
         border: none !important;
         border-radius: 8px !important;
         font-weight: bold !important;
@@ -71,8 +71,8 @@ st.markdown(f"""
     /* Tags et Toggles */
     .tag-label {{
         display: inline-block;
-        background-color: #f0f2f6;
-        color: #31333f;
+        background-color: #b6beb1;
+        color: #b6beb1;
         padding: 2px 10px;
         border-radius: 15px;
         margin-right: 5px;
@@ -80,10 +80,10 @@ st.markdown(f"""
         font-weight: bold;
     }}
     div[data-testid="stWidgetLabel"] + div div[role="switch"] {{
-        background-color: #f0f2f6 !important;
+        background-color: #91222c !important;
     }}
     div[data-testid="stWidgetLabel"] + div div[aria-checked="true"] {{
-        background-color: #d92644 !important;
+        background-color: #91222c !important;
     }}
     </style>
     """, unsafe_allow_html=True)
