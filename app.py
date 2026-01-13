@@ -48,11 +48,21 @@ st.markdown(f"""
         -webkit-text-fill-color: #202b24 !important;
     }}
 
-    /* Expanders */
+    /* 4. ACCORDÉONS (Expanders) */
+    /* État fermé */
     div[data-testid="stExpander"] {{
-        background-color: #efede1 !important;
+        background-color: #f8e6d2 !important;
         border: none !important;
         border-radius: 8px !important;
+    }}
+    /* État OUVERT (En-tête et corps) */
+    div[data-testid="stExpander"] details[open] summary, 
+    div[data-testid="stExpander"] details[open] {{
+        background-color: #b6beb1 !important;
+    }}
+    /* Couleur au survol */
+    div[data-testid="stExpander"] summary:hover {{
+        background-color: #b6beb1 !important;
     }}
 
     /* Bouton Y aller */
@@ -84,19 +94,22 @@ st.markdown(f"""
         font-weight: bold;
     }}
 
-    /* Le bouton rond qui bouge dans le switch */
-    div[data-testid="stWidgetLabel"] + div div[role="switch"] > div:first-child {{
+    /* 7. SWITCH (Bouton rond et Rail) */
+    /* LE BOUTON ROND (Thumb) - On cible l'élément transformé */
+    div[role="switch"] > div:nth-child(2) {{
         background-color: #efede1 !important;
     }}
     
-    /* Rail du switch (Toggles) */
-    div[data-testid="stWidgetLabel"] + div div[role="switch"] {{
-        background-color: #a39e9b !important;
+    /* Le rail éteint */
+    div[role="switch"] {{
+        background-color: #b6beb1 !important;
     }}
-    /* Couleur quand activé */
-    div[data-testid="stWidgetLabel"] + div div[aria-checked="true"] {{
+    
+    /* Le rail allumé */
+    div[aria-checked="true"][role="switch"] {{
         background-color: #d92644 !important;
     }}
+    
     </style>
     """, unsafe_allow_html=True)
 
