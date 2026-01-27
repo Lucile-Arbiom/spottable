@@ -73,7 +73,7 @@ st.title("Mes spots")
 # 3. Chargement des Données (Utilisation explicite du fichier Spottable v2.csv)
 try:
     # Lecture directe
-    df = pd.read_csv("Spottable v2.csv", sep=None, engine='python')
+    df = pd.read_csv("Spottable v3.csv", sep=None, engine='python')
     df.columns = df.columns.str.strip().str.lower()
     
     # Identification des colonnes GPS et Lien
