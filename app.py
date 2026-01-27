@@ -1,11 +1,15 @@
 import streamlit as st
 import pandas as pd
 import pydeck as pdk
+import re
 
 # 1. Configuration de la page
 st.set_page_config(page_title="Mes spots", layout="wide")
 
-# 2. Style CSS
+# Forcer Streamlit à ne pas mettre les données en cache pour voir vos modifs en direct
+st.cache_data.clear()
+
+# 2. Style CSS (Identique à votre design)
 st.markdown(f"""
     <style>
     .stApp {{ background-color: #efede1 !important; }}
@@ -14,11 +18,10 @@ st.markdown(f"""
     .main .block-container {{ padding-top: 2rem !important; }}
     h1 {{ color: #d92644 !important; margin-top: -30px !important; }}
     html, body, [class*="st-"], p, div, span, label, h3 {{ color: #202b24 !important; }}
-    
-    /* Expanders */
+
     div[data-testid="stExpander"] {{
         background-color: #efede1 !important;
-        border: 0.5px solid #b6beb1 !important;
+        border: 0.25px solid #b6beb1 !important;
         border-radius: 8px !important;
         margin-bottom: 10px !important;
     }}
@@ -28,12 +31,10 @@ st.markdown(f"""
         border-bottom: 1px solid #b6beb1 !important;
     }}
 
-    /* Switch */
     div[role="switch"] {{ background-color: #b6beb1 !important; }}
     div[aria-checked="true"][role="switch"] {{ background-color: #d92644 !important; }}
     div[role="switch"] > div:last-child {{ background-color: #efede1 !important; box-shadow: none !important; }}
 
-    /* Recherche */
     div[data-testid="stTextInput"] div[data-baseweb="input"] {{ background-color: #b6beb1 !important; border: none !important; }}
     div[data-testid="stTextInput"] input {{ color: #202b24 !important; -webkit-text-fill-color: #202b24 !important; }}
 
@@ -51,28 +52,43 @@ st.markdown(f"""
     </style>
     """, unsafe_allow_html=True)
 
+# Fonction pour extraire les coordonnées GPS du lien si elles existent (plus précises)
+def extract_precise_coords(url):
+    if pd.isna(url): return None, None
+    match = re.search(r'@(-?\d+\.\d+),(-?\d+\.\d+)', str(url))
+    if match:
+        return float(match.group(1)), float(match.group(2))
+    return None, None
+
 st.title("Mes spots")
 
+# 3. Chargement SANS CACHE pour lire les modifications de votre CSV
 try:
-    # 3. Chargement et Nettoyage STRICT
+    # Lecture directe du fichier
     df = pd.read_csv("Spottable v2.csv", sep=None, engine='python')
     df.columns = df.columns.str.strip().str.lower()
     
-    # Identification dynamique des colonnes GPS
-    lat_col = next((c for c in df.columns if c in ['latitude', 'lat']), None)
-    lon_col = next((c for c in df.columns if c in ['longitude', 'lon']), None)
+    # On identifie les colonnes de base
+    c_lat = next((c for c in df.columns if c in ['lat', 'latitude']), None)
+    c_lon = next((c for c in df.columns if c in ['lon', 'longitude']), None)
+    c_link = next((c for c in df.columns if any(w in c for w in ['map', 'lien', 'geo'])), None)
+
+    # Conversion propre des coordonnées existantes (remplacement virgule par point)
+    if c_lat and c_lon:
+        df['lat'] = pd.to_numeric(df[c_lat].astype(str).str.replace(',', '.'), errors='coerce')
+        df['lon'] = pd.to_numeric(df[c_lon].astype(str).str.replace(',', '.'), errors='coerce')
     
-    if lat_col and lon_col:
-        # Conversion forcée en nombres flottants (en remplaçant les virgules par des points si besoin)
-        df['lat'] = pd.to_numeric(df[lat_col].astype(str).str.replace(',', '.'), errors='coerce')
-        df['lon'] = pd.to_numeric(df[lon_col].astype(str).str.replace(',', '.'), errors='coerce')
-    
-    # Suppression des lignes où les coordonnées sont invalides
+    # Tentative d'affinage via le lien Google Maps
+    if c_link:
+        df['extracted'] = df[c_link].apply(extract_precise_coords)
+        df['lat'] = df.apply(lambda r: r['extracted'][0] if r['extracted'][0] else r['lat'], axis=1)
+        df['lon'] = df.apply(lambda r: r['extracted'][1] if r['extracted'][1] else r['lon'], axis=1)
+
+    # Nettoyage
     df = df.dropna(subset=['lat', 'lon'])
 
     c_name = next((c for c in df.columns if c in ['name', 'nom']), df.columns[0])
     c_addr = next((c for c in df.columns if c in ['address', 'adresse']), df.columns[1])
-    c_link = next((c for c in df.columns if any(w in c for w in ['map', 'lien', 'geo'])), None)
     col_tags = next((c for c in df.columns if c == 'tags'), None)
 
     # RECHERCHE
@@ -95,34 +111,17 @@ try:
         if selected_tags:
             df_filtered = df_filtered[df_filtered[col_tags].apply(lambda x: any(t.strip() in selected_tags for t in str(x).split(',')) if pd.notna(x) else False)]
 
-    # 4. AFFICHAGE CARTE
+    # 4. AFFICHAGE
     col1, col2 = st.columns([2, 1])
 
     with col1:
-        if not df_filtered.empty:
-            # Zoom plus important (15) pour vérifier la précision
-            view_state = pdk.ViewState(latitude=df_filtered["lat"].mean(), longitude=df_filtered["lon"].mean(), zoom=14)
-            
+        df_map = df_filtered.copy()
+        if not df_map.empty:
+            view_state = pdk.ViewState(latitude=df_map["lat"].mean(), longitude=df_map["lon"].mean(), zoom=13)
             icon_data = {"url": "https://img.icons8.com/ios-filled/100/d92644/marker.png", "width": 100, "height": 100, "anchorY": 100}
-            df_filtered["icon_data"] = [icon_data for _ in range(len(df_filtered))]
-            
-            # Utilisation du Layer IconLayer avec les colonnes nettoyées
-            layers = [pdk.Layer(
-                "IconLayer", 
-                data=df_filtered, 
-                get_icon="icon_data", 
-                get_size=4, 
-                size_scale=10, 
-                get_position=["lon", "lat"], 
-                pickable=True
-            )]
-            
-            st.pydeck_chart(pdk.Deck(
-                map_style="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
-                initial_view_state=view_state,
-                layers=layers,
-                tooltip={"text": "{"+c_name+"}"}
-            ))
+            df_map["icon_data"] = [icon_data for _ in range(len(df_map))]
+            layers = [pdk.Layer("IconLayer", data=df_map, get_icon="icon_data", get_size=4, size_scale=10, get_position=["lon", "lat"], pickable=True)]
+            st.pydeck_chart(pdk.Deck(map_style="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json", initial_view_state=view_state, layers=layers))
 
     with col2:
         for _, row in df_filtered.iterrows():
@@ -135,4 +134,4 @@ try:
                     st.link_button("**Y aller**", row[c_link], use_container_width=True)
 
 except Exception as e:
-    st.error(f"Erreur : {e}")
+    st.error(f"Erreur de lecture : {e}")
