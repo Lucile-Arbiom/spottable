@@ -6,6 +6,11 @@ import re  # Indispensable pour la précision via les liens
 # 1. Configuration de la page
 st.set_page_config(page_title="Mes spots", layout="wide")
 
+st.write("Fichiers détectés :", st.runtime.get_instance().get_script_run_context().file_path)
+# Affiche le contenu brut des premières lignes pour vérifier
+test_df = pd.read_csv("Spottable v3.csv")
+st.write("Aperçu V3 :", test_df.head(2))
+
 # FORCE LE RECHARGEMENT : On vide le cache pour lire ton fichier CSV à chaque fois
 st.cache_data.clear() 
 
