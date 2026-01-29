@@ -141,4 +141,4 @@ try:
                     st.link_button("**Y aller**", row[c_link], use_container_width=True)
 
 except Exception as e:
-    st.error(f"Erreur avec le fichier 'Spottable v2.csv' : {e}")
+    st.error(f"Erreur avec le fichier 'Spottable v3.csv' : {e}")
